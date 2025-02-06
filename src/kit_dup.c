@@ -131,7 +131,7 @@ SEXP dupVecIndex(SEXP x) {
     const double *restrict px = REAL(x);
     union uno tpv;
     for (int i = 0; i != n; ++i) {
-      tpv.d = px[i]; // R_IsNA(px[i]) ? NA_REAL : (R_IsNaN(px[i]) ? R_NaN : px[i]);
+      tpv.d = px[i] + 0.0; // R_IsNA(px[i]) ? NA_REAL : (R_IsNaN(px[i]) ? R_NaN : px[i]);
       id = HASH(tpv.u[0] + tpv.u[1], K);
       while(h[id]) {
         if(REQUAL(px[h[id]-1], px[i])) {
@@ -157,9 +157,9 @@ SEXP dupVecIndex(SEXP x) {
       } else if (C_IsNaN(tmp)) {
         tmp.r = tmp.i = R_NaN;
       }
-      tpv.d = tmp.r;
+      tpv.d = tmp.r + 0.0;
       u = tpv.u[0] ^ tpv.u[1];
-      tpv.d = tmp.i;
+      tpv.d = tmp.i + 0.0;
       u ^= tpv.u[0] ^ tpv.u[1];
       id = HASH(u, K);
       while(h[id]) {
@@ -295,7 +295,7 @@ SEXP dupVecIndexKeepNA(SEXP x) {
         pans_i[i] = NA_INTEGER;
         continue;
       }
-      tpv.d = px[i];
+      tpv.d = px[i] + 0.0;
       id = HASH(tpv.u[0] + tpv.u[1], K);
       while(h[id]) {
         if(REQUAL(px[h[id]-1], px[i])) {
@@ -320,9 +320,9 @@ SEXP dupVecIndexKeepNA(SEXP x) {
         pans_i[i] = NA_INTEGER;
         continue;
       }
-      tpv.d = tmp.r;
+      tpv.d = tmp.r + 0.0;
       u = tpv.u[0] ^ tpv.u[1];
-      tpv.d = tmp.i;
+      tpv.d = tmp.i + 0.0;
       u ^= tpv.u[0] ^ tpv.u[1];
       id = HASH(u, K);
       while(h[id]) {
@@ -473,7 +473,7 @@ SEXP dupVecIndexTwoVectors(SEXP x, SEXP y) {
           union uno tpx, tpy;
           // fill hash table with indices of 'table'
           for (int i = 0; i != n; ++i) {
-            tpx.d = px[i]; tpy.d = py[i];
+            tpx.d = px[i] + 0.0; tpy.d = py[i] + 0.0;
             id = HASH((64988430769U * (tpx.u[0] + tpx.u[1])) + tpy.u[0] + tpy.u[1], K); // Best combination it seems
             while(h[id]) {
               hid = h[id]-1;
@@ -497,7 +497,7 @@ SEXP dupVecIndexTwoVectors(SEXP x, SEXP y) {
         const double *restrict pr = REAL_RO(tx == REALSXP ? x : y);
         union uno tpv;
         for (int i = 0; i != n; ++i) {
-          tpv.d = pr[i];
+          tpv.d = pr[i] + 0.0;
           id = HASH((64988430769U * pi[i]) + tpv.u[0] + tpv.u[1], K); // Best combination it seems
           while(h[id]) {
             hid = h[id]-1;
@@ -517,7 +517,7 @@ SEXP dupVecIndexTwoVectors(SEXP x, SEXP y) {
         const double *restrict pr = REAL_RO(tx == REALSXP ? x : y);
         union uno tpv;
         for (int i = 0; i != n; ++i) {
-          tpv.d = pr[i];
+          tpv.d = pr[i] + 0.0;
           id = HASH((tpv.u[0] + tpv.u[1]) * ((uintptr_t)ps[i] & 0xffffffff), K); // Best combination it seems
           while(h[id]) {
             hid = h[id]-1;
@@ -655,7 +655,7 @@ int dupVecSecond(int *restrict pidx, int *restrict pans_i, SEXP x, const int n, 
     const unsigned int mult = (M-1) / ng; // -1 because C is zero indexed
     union uno tpv;
     for (int i = 0; i != n; ++i) {
-      tpv.d = px[i]; // R_IsNA(px[i]) ? NA_REAL : (R_IsNaN(px[i]) ? R_NaN :px[i]);
+      tpv.d = px[i] + 0.0; // R_IsNA(px[i]) ? NA_REAL : (R_IsNaN(px[i]) ? R_NaN :px[i]);
       id = (pidx[i]*mult) ^ HASH(tpv.u[0] + tpv.u[1], K); // HASH((tpv.u[0] + tpv.u[1]) ^ pidx[i], K) + pidx[i]; // Note: This is much faster than just adding pidx[i] to the hash value...
       while(h[id]) { // Problem: This value might be seen before, but not in combination with that pidx value...
         hid = h[id]-1; // The issue here is that REQUAL(px[hid], px[i]) could be true but pidx[hid] == pidx[i] fails, although the same combination of px and pidx could be seen earlier before...
@@ -683,9 +683,9 @@ int dupVecSecond(int *restrict pidx, int *restrict pans_i, SEXP x, const int n, 
       } else if (C_IsNaN(tmp)) {
         tmp.r = tmp.i = R_NaN;
       }
-      tpv.d = tmp.r;
+      tpv.d = tmp.r + 0.0;
       u = tpv.u[0] ^ tpv.u[1];
-      tpv.d = tmp.i;
+      tpv.d = tmp.i + 0.0;
       u ^= tpv.u[0] ^ tpv.u[1];
       id = (pidx[i]*mult) ^ HASH(u, K);
       while(h[id]) {
@@ -938,7 +938,7 @@ SEXP funiqueC(SEXP x) {
     const double *restrict px = REAL(x);
     union uno tpv;
     for (int i = 0; i != n; ++i) {
-      tpv.d = px[i];
+      tpv.d = px[i] + 0.0;
       id = HASH(tpv.u[0] + tpv.u[1], K);
       while(h[id]) {
         if(REQUAL(px[h[id]-1], px[i])) goto rbl;
@@ -969,9 +969,9 @@ SEXP funiqueC(SEXP x) {
       } else if (C_IsNaN(tmp)) {
         tmp.r = tmp.i = R_NaN;
       }
-      tpv.d = tmp.r;
+      tpv.d = tmp.r + 0.0;
       u = tpv.u[0] ^ tpv.u[1];
-      tpv.d = tmp.i;
+      tpv.d = tmp.i + 0.0;
       u ^= tpv.u[0] ^ tpv.u[1];
       id = HASH(u, K);
       while(h[id]) {
