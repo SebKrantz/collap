@@ -47,6 +47,7 @@ test_that("rsplit data frame method works as intended", {
 
   expect_equal(rsplit(mtcars, mtcars$cyl), split(mtcars, mtcars$cyl))
   expect_equal(rsplit(mtcars, mpg ~ cyl), split(mtcars$mpg, mtcars$cyl))
+  expect_equal(rsplit(mtcars, ~ cyl, nest = TRUE)$data, rsplit(mtcars, ~ cyl))
   expect_equal(rsplit(mtcars, mpg ~ cyl, simplify = FALSE), split(mtcars["mpg"], mtcars$cyl))
 
   expect_true(all_obj_equal(rsplit(mtcars, mtcars[.c(cyl, vs, am)], flatten = TRUE),

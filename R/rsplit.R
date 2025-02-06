@@ -64,7 +64,7 @@ rsplit.units <- rsplit.zoo
 
 rsplit.data.frame <- function(x, by, drop = TRUE, flatten = FALSE, # check = TRUE,
                               cols = NULL, keep.by = FALSE, simplify = TRUE,
-                              use.names = TRUE, ...) {
+                              use.names = TRUE, nest = FALSE,  ...) {
 
   if(is.call(by)) {
     nam <- attr(x, "names")
@@ -98,6 +98,8 @@ rsplit.data.frame <- function(x, by, drop = TRUE, flatten = FALSE, # check = TRU
              function(i) `attr<-`(.Call(C_subsetDT, x, i, j, FALSE), "row.names", rown[i]))
     }
   }
+
+  if(nest) return(ftransform(unique(data.frame(by)), data = gsplit_DF(x, by)))
 
   if(is.atomic(by) || flatten || is_GRP(by)) return(gsplit_DF(x, by, ...))
 
